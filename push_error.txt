@@ -1,0 +1,59 @@
+﻿git : remote: warning
+: File venv/Lib/site-
+packages/clang/native
+/libclang.dll is 80.1
+0 MB; this is larger 
+than GitHub's recomme
+nded maximum file siz
+e of 50.00 MB        
+위치 줄:1 문자:1
++ git push origin mai
+n --force 2>&1 | Out-
+File -FilePath push_e
+rror.txt ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (remote:   
+  warning...0.00     
+MB        :Strin    g
+) [], RemoteExc    ep
+tion
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+remote: error: Trace:
+ 8621cafa36f167d7b2d7
+a1b459575b6d992dcf229
+064c19c668cd1ff6e338b
+54        
+remote: error: See ht
+tps://gh.io/lfs for m
+ore information.     
+   
+remote: error: File v
+env/Lib/site-packages
+/tensorflow/python/_p
+ywrap_tensorflow_inte
+rnal.pyd is 920.83 MB
+; this exceeds GitHub
+'s file size limit of
+ 100.00 MB        
+remote: error: GH001:
+ Large files detected
+. You may want to try
+ Git Large File Stora
+ge - https://git-lfs.
+github.com.        
+To https://github.com
+/LightCyan711/onitama
+.git
+ ! [remote rejected] 
+  main -> main (pre-r
+eceive hook declined)
+error: failed to push
+ some refs to 'https:
+//github.com/LightCya
+n711/onitama.git'
