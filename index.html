@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오니타마 AI 🥋</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🥋 오니타마 AI</h1>
+            <p class="subtitle">강화학습으로 마스터하는 전략 보드게임</p>
+        </header>
+
+        <div class="mode-tabs">
+            <button id="tab-train" class="tab active">🧠 학습 모드</button>
+            <button id="tab-play" class="tab">⚔️ 대전 모드</button>
+        </div>
+
+        <!-- 학습 모드 -->
+        <div id="panel-train" class="panel">
+            <div class="game-area">
+                <canvas id="canvas-train" width="350" height="350"></canvas>
+            </div>
+            <div class="controls">
+                <button id="btn-start-train" class="btn btn-primary">▶ 학습 시작</button>
+                <button id="btn-stop-train" class="btn btn-danger" disabled>⏹ 중지</button>
+                <button id="btn-save" class="btn btn-success">💾 저장 (브라우저)</button>
+                <button id="btn-download" class="btn btn-success">📥 파일로 저장</button>
+                <button id="btn-save-onnx" class="btn btn-secondary" style="background-color: #6f42c1;">📦 ONNX용 저장</button>
+                <button id="btn-load" class="btn btn-info">📂 파일에서 로드</button>
+                <button id="btn-reset" class="btn btn-warning">🔄 초기화</button>
+                <input type="file" id="file-input" multiple accept=".json,.bin" style="display: none;">
+                <div class="speed-control">
+                    <label>속도:</label>
+                    <input type="range" id="train-speed" min="1" max="50" value="10">
+                    <span id="speed-display">10x</span>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">에피소드</div>
+                    <div id="stat-ep" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">승률 (최근 100)</div>
+                    <div id="stat-wr" class="stat-value">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">평균 턴</div>
+                    <div id="stat-turns" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">학습 손실</div>
+                    <div id="stat-loss" class="stat-value">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 대전 모드 -->
+        <div id="panel-play" class="panel hidden">
+            <div class="player-info">
+                <div class="center-card" id="center-card"></div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="canvas-play" width="350" height="350"></canvas>
+            </div>
+
+            <div class="player-info">
+                <div class="player-cards" id="player-cards">
+                    <div class="card-label">내 카드 (클릭하여 선택)</div>
+                    <div class="cards-holder"></div>
+                </div>
+            </div>
+
+            <div class="game-status">
+                <div id="turn-indicator">당신의 차례입니다</div>
+                <div class="help-text">
+                    💡 <strong>플레이 방법:</strong><br>
+                    1️⃣ 아래 카드 중 하나를 클릭하여 선택<br>
+                    2️⃣ 빨간 말을 클릭<br>
+                    3️⃣ 초록색 원(이동 가능 위치)을 클릭하여 이동
+                </div>
+                <button id="btn-new-game" class="btn btn-primary">🎲 새 게임</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>TensorFlow.js | Self-Play Reinforcement Learning</p>
+        </footer>
+    </div>
+
+    <script src="js/cards.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/agent.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

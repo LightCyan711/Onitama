@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오니타마 AI (ONNX) 🥋</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- ONNX Runtime Web -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <style>
+        .onnx-badge {
+            background-color: #6f42c1;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5em;
+            z-index: 1000;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" class="hidden">
+        AI 모델 로딩 중... 🤖
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🥋 오니타마 AI <span class="onnx-badge">ONNX Powered</span></h1>
+            <p class="subtitle">TensorFlow.js 없이 실행되는 초경량 AI</p>
+        </header>
+
+        <div id="panel-play" class="panel">
+            <div class="player-info">
+                <div class="center-card" id="center-card"></div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="canvas-play" width="350" height="350"></canvas>
+            </div>
+
+            <div class="player-info">
+                <div class="player-cards" id="player-cards">
+                    <div class="card-label">내 카드 (클릭하여 선택)</div>
+                    <div class="cards-holder"></div>
+                </div>
+            </div>
+
+            <div class="game-status">
+                <div id="turn-indicator">게임 준비 중...</div>
+                <div class="help-text">
+                    💡 <strong>플레이 방법:</strong><br>
+                    1️⃣ 아래 카드 중 하나를 클릭하여 선택<br>
+                    2️⃣ 빨간 말을 클릭<br>
+                    3️⃣ 초록색 원(이동 가능 위치)을 클릭하여 이동
+                </div>
+                <button id="btn-new-game" class="btn btn-primary">🎲 새 게임 시작</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Runs with <strong>ONNX Runtime Web</strong> (WASM Endpoint)</p>
+        </footer>
+    </div>
+
+    <!-- 순서 중요: 종속성 -->
+    <script src="js/cards.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/ui.js"></script>
+    
+    <!-- ONNX Agent -->
+    <script src="js/onnx_agent.js"></script>
+
+    <script>
+        // Main Logic (Simplified for ONNX only)
+        let playUI, playGame, agent;
+        let selectedPiece = null;
+        let selectedCard = null;
+        let possibleMoves = [];
+
+        async function init() {
+            const loading = document.getElementById('loading-overlay');
+            loading.classList.remove('hidden');
+
+            playUI = new OnitamaUI('canvas-play');
+            playGame = new OnitamaGame();
+            
+            // ONNX Agent 초기화
+            agent = new OnitamaOnnxAgent();
+            const success = await agent.load('./onitama-actor.onnx');
+            
+            loading.classList.add('hidden');
+
+            if (!success) {
+                alert('모델 로드 실패! index.html(학습버전)으로 이동하거나 경로를 확인하세요.');
+                return;
+            }
+
+            // 게임 시작
+            startNewGame();
+            
+            // 이벤트 리스너 설정
+            setupEventListeners();
+        }
+
+        function startNewGame() {
+            playGame.reset();
+            updateUI();
+            selectedPiece = null;
+            selectedCard = null;
+            possibleMoves = [];
+            document.getElementById('turn-indicator').textContent = "당신의 차례입니다 (Red)";
+        }
+
+        function updateUI() {
+            playUI.drawBoard(playGame);
+            playUI.renderCards(playGame, true);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btn-new-game').onclick = startNewGame;
+
+            // 카드 클릭
+            document.addEventListener('click', (e) => {
+                const cardEl = e.target.closest('.card');
+                if (cardEl && cardEl.closest('#player-cards')) {
+                    if (playGame.gameOver || playGame.currentPlayer !== 1) return;
+
+                    const cards = Array.from(document.querySelectorAll('#player-cards .card'));
+                    const cardIdx = cards.indexOf(cardEl);
+                    if (cardIdx !== -1) selectCard(cardIdx);
+                }
+            });
+
+            // 캔버스 클릭 (보드)
+            document.getElementById('canvas-play').onclick = handleBoardClick;
+        }
+
+        function selectCard(cardIdx) {
+            selectedCard = cardIdx;
+            
+            // UI 하이라이트
+            document.querySelectorAll('#player-cards .card').forEach(c => c.classList.remove('selected'));
+            const cards = document.querySelectorAll('#player-cards .card');
+            if (cards[cardIdx]) cards[cardIdx].classList.add('selected');
+            
+            if (selectedPiece) updatePossibleMoves();
+        }
+
+        function handleBoardClick(e) {
+            if (playGame.gameOver) return;
+            if (playGame.currentPlayer !== 1) return; // AI 턴 방지
+
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const pos = playUI.getBoardPosition(x, y);
+            
+            if (!pos) return;
+            const [clickX, clickY] = pos;
+
+            // 내 말 선택
+            if (!selectedPiece) {
+                const piece = playGame.board[clickY][clickX];
+                if (piece > 0) { // Red Piece
+                    selectedPiece = [clickX, clickY];
+                    playUI.drawBoard(playGame);
+                    playUI.drawHighlight(clickX, clickY);
+                    if (selectedCard !== null) updatePossibleMoves();
+                }
+            } else {
+                // 이동 시도
+                if (selectedCard === null) {
+                    alert('먼저 카드를 선택하세요!');
+                    return;
+                }
+
+                const isValidMove = possibleMoves.some(([mx, my]) => mx === clickX && my === clickY);
+
+                if (isValidMove) {
+                    executeMove({
+                        from: selectedPiece,
+                        to: [clickX, clickY],
+                        cardIdx: selectedCard
+                    });
+                } else {
+                    // 다른 말 선택 or 취소
+                    const piece = playGame.board[clickY][clickX];
+                    if (piece > 0) {
+                        selectedPiece = [clickX, clickY];
+                        updatePossibleMoves();
+                    } else {
+                        selectedPiece = null;
+                        selectedCard = null;
+                        possibleMoves = [];
+                        updateUI();
+                    }
+                }
+            }
+        }
+
+        function updatePossibleMoves() {
+            possibleMoves = [];
+            if (!selectedPiece || selectedCard === null) return;
+            
+            const [px, py] = selectedPiece;
+            const cardId = playGame.redCards[selectedCard];
+            const card = getCard(cardId);
+            
+            card.moves.forEach(([dx, dy]) => {
+                const newX = px + dx;
+                const newY = py + dy;
+                if (newX >= 0 && newX < 5 && newY >= 0 && newY < 5) {
+                    if (playGame.board[newY][newX] <= 0) { // 빈칸(-1) or 적군(-1, -2)
+                        possibleMoves.push([newX, newY]);
+                    }
+                }
+            });
+
+            playUI.drawBoard(playGame);
+            playUI.drawHighlight(selectedPiece[0], selectedPiece[1]);
+            possibleMoves.forEach(([x, y]) => playUI.drawMoveIndicator(x, y));
+        }
+
+        async function executeMove(action) {
+            playGame.makeMove(action);
+            
+            // 상태 초기화
+            selectedPiece = null;
+            selectedCard = null;
+            possibleMoves = [];
+            updateUI();
+
+            if (checkGameOver()) return;
+
+            // AI 턴
+            document.getElementById('turn-indicator').textContent = "AI 생각 중... (Blue)";
+            
+            // 화면 렌더링을 위해 잠시 대기
+            setTimeout(async () => {
+                const aiAction = await agent.selectAction(playGame);
+                
+                if (aiAction) {
+                    playGame.makeMove(aiAction);
+                    updateUI();
+                    if (checkGameOver()) return;
+                } else {
+                    alert("AI 기권! 당신의 승리입니다.");
+                }
+                
+                document.getElementById('turn-indicator').textContent = "당신의 차례입니다 (Red)";
+            }, 100);
+        }
+
+        function checkGameOver() {
+            if (playGame.gameOver) {
+                setTimeout(() => {
+                    if (playGame.winner === 1) alert('🏆 승리!');
+                    else if (playGame.winner === -1) alert('😢 패배...');
+                    else alert('무승부');
+                }, 100);
+                return true;
+            }
+            return false;
+        }
+
+        // 시작
+        window.onload = init;
+    </script>
+</body>
+</html>
