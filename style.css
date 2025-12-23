@@ -22,9 +22,14 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1010 100%);
     color: var(--text-light);
-    min-height: 100vh;
-    padding: 20px;
+    height: 100vh;
+    padding: 10px;
+    overflow: hidden; /* 스크롤 방지 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
+
 
 .container {
     max-width: 900px;
@@ -33,8 +38,9 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
+
 
 header h1 {
     font-size: 2.5rem;
@@ -88,8 +94,13 @@ header h1 {
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 15px;
-    padding: 25px;
+    padding: 15px;
+    height: calc(100vh - 80px); /* 헤더/푸터 제외 높이 제어 */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
+
 
 .panel.hidden {
     display: none;
@@ -99,15 +110,21 @@ header h1 {
 .game-area {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: 10px 0;
+    flex: 1; /* 가용한 공간 차지 */
+    min-height: 0;
 }
+
 
 canvas {
     border: 2px solid var(--accent-gold);
     border-radius: 10px;
     background: var(--bg-board);
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+    max-height: 50vh; /* 캔버스 크기 조절 */
+    width: auto;
 }
+
 
 /* 컨트롤 */
 .controls {
@@ -289,9 +306,9 @@ canvas {
 
 .help-text {
     color: var(--text-dim);
-    font-size: 0.85rem;
-    margin-bottom: 15px;
-    padding: 10px;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    padding: 5px;
     background: rgba(212, 175, 55, 0.05);
     border-radius: 8px;
     border: 1px solid rgba(212, 175, 55, 0.2);
@@ -300,6 +317,7 @@ canvas {
 .help-text strong {
     color: var(--accent-gold);
 }
+
 
 /* 카드 도감 보완 */
 #card-encyclopedia {
@@ -327,27 +345,25 @@ canvas {
 }
 
 #card-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    display: grid !important; /* 강제 적용 */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
     gap: 15px;
-    justify-items: center;
+    width: 100%;
     margin-bottom: 20px;
 }
 
 .encyclopedia-card {
     width: 100px !important;
     height: 130px !important;
-}
-
-.encyclopedia-card .card-name {
-    font-size: 0.9rem !important;
+    display: flex !important; /* 겹침 방지 */
 }
 
 .encyclopedia-card.glow {
-    border-color: #ffd700;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--accent-blue); /* 파란색으로 변경 */
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+    background: rgba(59, 130, 246, 0.1);
 }
+
 
 #close-encyclopedia {
     display: block;
@@ -358,10 +374,11 @@ canvas {
 /* 푸터 */
 footer {
     text-align: center;
-    margin-top: 30px;
+    margin-top: 5px; /* 대폭 축소 */
     color: var(--text-dim);
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* 크기 축소 */
 }
+
 
 /* 반응형 */
 @media (max-width: 700px) {
