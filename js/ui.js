@@ -244,22 +244,27 @@ class OnitamaUI {
         });
 
         document.addEventListener('keydown', (e) => {
-            console.log(`Key pressed: ${e.key}`); // Debugging log
             if (e.key.toLowerCase() === 'f') {
-                console.log('Toggling encyclopedia visibility'); // Debugging log
+                e.preventDefault(); // 브라우저 기본 검색(Ctrl+F) 등과 충돌 방지 (필요 시)
                 encyclopedia.classList.toggle('hidden');
-                this.highlightCurrentGameCards(cards);
+                
+                // 전역 변수 playGame이 존재하면 하이라이트 실행
+                if (typeof playGame !== 'undefined') {
+                    this.highlightCurrentGameCards(cards, playGame);
+                }
             }
         });
     }
 
-    highlightCurrentGameCards(cards) {
-        const currentGameCardIds = [...game.redCards, game.centerCard, ...game.blueCards];
+    highlightCurrentGameCards(cards, gameInstance) {
+        if (!gameInstance) return;
+        const currentGameCardIds = [...gameInstance.redCards, gameInstance.centerCard, ...gameInstance.blueCards];
         const cardElements = document.querySelectorAll('.encyclopedia-card');
 
         cardElements.forEach(cardEl => {
-            const cardId = cards.find(card => card.name === cardEl.querySelector('.card-name').textContent)?.id;
-            if (currentGameCardIds.includes(cardId)) {
+            const cardName = cardEl.querySelector('.card-name').textContent;
+            const cardObj = cards.find(card => card.name === cardName);
+            if (cardObj && currentGameCardIds.includes(cardObj.id)) {
                 cardEl.classList.add('glow');
             } else {
                 cardEl.classList.remove('glow');
