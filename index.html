@@ -43,33 +43,42 @@
         </header>
 
         <div id="panel-play" class="panel">
-            <div class="player-info">
-                <div class="center-card" id="center-card"></div>
-            </div>
-            
-            <div class="game-area">
-                <canvas id="canvas-play" width="350" height="350"></canvas>
-            </div>
-
-            <div class="player-info">
-                <div class="player-cards" id="player-cards">
-                    <div class="card-label">내 카드 (클릭하여 선택)</div>
-                    <div class="cards-holder"></div>
+            <div class="game-layout">
+                <!-- 왼쪽: 보드 영역 -->
+                <div class="board-section">
+                    <div class="game-area">
+                        <canvas id="canvas-play" width="500" height="500"></canvas>
+                    </div>
                 </div>
-            </div>
 
-            <div class="game-status">
-                <div id="turn-indicator">게임 준비 중...</div>
-                <div class="help-text">
-                    💡 <strong>플레이 방법:</strong><br>
-                    1️⃣ 아래 카드 중 하나를 클릭하여 선택<br>
-                    2️⃣ 빨간 말을 클릭<br>
-                    3️⃣ 초록색 원(이동 가능 위치)을 클릭하여 이동<br>
-                    ⌨️ <strong>f</strong>를 누르면 카드목록을 볼 수 있습니다
+                <!-- 오른쪽: 정보 및 컨트롤 영역 -->
+                <div class="info-section">
+                    <div class="status-card">
+                        <div id="turn-indicator">게임 준비 중...</div>
+                        <div class="center-card-wrapper">
+                            <div class="card-label">중앙 카드</div>
+                            <div id="center-card"></div>
+                        </div>
+                    </div>
+
+                    <div class="player-cards-section">
+                        <div id="player-cards" class="player-cards">
+                            <div class="card-label">내 카드 (클릭하여 선택)</div>
+                            <div class="cards-holder"></div>
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <div class="help-text">
+                            ⌨️ <strong>f</strong>: 카드 목록 토글<br>
+                            1️⃣ 카드 선택 → 2️⃣ 말 선택 → 3️⃣ 이동
+                        </div>
+                        <button id="btn-new-game" class="btn btn-primary">🎲 새 게임 시작</button>
+                    </div>
                 </div>
-                <button id="btn-new-game" class="btn btn-primary">🎲 새 게임 시작</button>
             </div>
         </div>
+
     </div>
 
     <div id="card-encyclopedia" class="hidden">

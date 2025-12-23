@@ -6,9 +6,11 @@ class OnitamaUI {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
-        this.cellSize = 52;  // 350 / 5 = 70, 여백 고려 52
+        // 500px 캔버스에 최적화: (500 - 60) / 5 = 88
+        this.cellSize = 88; 
         this.boardOffset = 30;
     }
+
 
     drawBoard(game) {
         const ctx = this.ctx;
@@ -77,7 +79,8 @@ class OnitamaUI {
         const ctx = this.ctx;
         const px = this.boardOffset + x * this.cellSize + this.cellSize / 2;
         const py = this.boardOffset + y * this.cellSize + this.cellSize / 2;
-        const radius = 18;
+        const radius = 30; // 말 크기 확대 (기존 18)
+
         
         const isRed = piece > 0;
         const isMaster = Math.abs(piece) === 2;
@@ -198,8 +201,9 @@ class OnitamaUI {
         
         // 간단한 이동 패턴 시각화
         const canvas = document.createElement('canvas');
-        canvas.width = 50;
-        canvas.height = 50;
+        canvas.width = 70;
+        canvas.height = 70;
+
         const ctx = canvas.getContext('2d');
         
         // 배경
@@ -208,15 +212,16 @@ class OnitamaUI {
         
         // 중앙 (현재 위치)
         ctx.fillStyle = '#d4af37';
-        ctx.fillRect(23, 23, 4, 4);
+        ctx.fillRect(33, 33, 4, 4);
         
         // 이동 가능 위치
         ctx.fillStyle = card.color === 'red' ? '#dc2626' : '#3b82f6';
         card.moves.forEach(([dx, dy]) => {
-            const x = 25 + dx * 8;
-            const y = 25 + dy * 8;
-            ctx.fillRect(x - 2, y - 2, 4, 4);
+            const x = 35 + dx * 12; // 간격 확대 (기존 8)
+            const y = 35 + dy * 12;
+            ctx.fillRect(x - 3, y - 3, 6, 6);
         });
+
         
         patternDiv.appendChild(canvas);
         cardDiv.appendChild(nameDiv);
