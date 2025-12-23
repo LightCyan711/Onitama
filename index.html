@@ -35,6 +35,8 @@
     </style>
 </head>
 <body>
+    <button id="btn-guide" title="게임 방법">?</button>
+
     <div id="game-notice" class="hidden"></div>
     <div id="loading-overlay" class="hidden">
         AI 모델 로딩 중... 🤖
@@ -99,6 +101,44 @@
         <button id="close-encyclopedia" class="btn btn-secondary">닫기</button>
     </div>
 
+    <!-- 게임 가이드 모달 -->
+    <div id="modal-guide" class="modal">
+        <div class="modal-content">
+            <button id="btn-close-modal">&times;</button>
+            <h2>🥋 오니타마 게임 가이드</h2>
+            <div class="guide-text">
+                <h3>1. 게임 개요</h3>
+                <p>오니타마는 5x5 보드에서 펼쳐지는 2인용 전략 보드게임입니다. 각 플레이어는 1명의 마스터와 4명의 제자를 조종합니다.</p>
+                
+                <h3>2. 승리 조건</h3>
+                <ul>
+                    <li><strong>돌의 길 (Way of the Stone):</strong> 상대방의 마스터를 잡으면 승리합니다.</li>
+                    <li><strong>강의 길 (Way of the Stream):</strong> 내 마스터가 상대방의 사원 입구(중앙 칸)에 도달하면 승리합니다.</li>
+                </ul>
+
+                <h3>3. 게임 방법</h3>
+                <p>플레이어는 자신에게 주어진 2장의 무술 카드 중 하나를 선택하여 말을 이동시킵니다.</p>
+                <ul>
+                    <li>카드를 사용한 후에는 그 카드를 <strong>중앙 카드</strong>와 교체합니다.</li>
+                    <li>교체된 카드는 다음 턴에 상대방이 사용할 수 있게 됩니다.</li>
+                    <li>카드는 계속해서 순환하며 전략적인 선택이 핵심입니다.</li>
+                </ul>
+
+                <h3>4. 조작 방법</h3>
+                <p>1️⃣ 사용할 카드를 클릭하세요.<br>
+                   2️⃣ 이동할 내 말(빨간색)을 클릭하세요.<br>
+                   3️⃣ 표시되는 초록색 원 중 하나를 클릭하여 이동하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 종료 오버레이 -->
+    <div id="game-over-overlay">
+        <div id="game-over-title" class="game-over-title"></div>
+        <div id="game-over-msg" class="game-over-msg"></div>
+        <button id="btn-restart">다시 시작하기</button>
+    </div>
+
 
 
     <!-- 순서 중요: 종속성 -->
@@ -150,6 +190,9 @@
             selectedCard = null;
             possibleMoves = [];
             
+            // 종료 화면 숨기기
+            document.getElementById('game-over-overlay').classList.remove('show');
+            
             updateUI();
             
             // 만약 첫 턴이 AI(Blue, -1)라면 즉시 트리거
@@ -175,6 +218,18 @@
 
         function setupEventListeners() {
             document.getElementById('btn-new-game').onclick = startNewGame;
+            document.getElementById('btn-restart').onclick = startNewGame;
+
+            // 가이드 모달 열기/닫기
+            const guideBtn = document.getElementById('btn-guide');
+            const guideModal = document.getElementById('modal-guide');
+            const closeModalBtn = document.getElementById('btn-close-modal');
+
+            guideBtn.onclick = () => guideModal.classList.add('show');
+            closeModalBtn.onclick = () => guideModal.classList.remove('show');
+            window.onclick = (e) => {
+                if (e.target === guideModal) guideModal.classList.remove('show');
+            };
 
             // 카드 클릭 (이벤트 위임 방식으로 더 견고하게 변경)
             document.addEventListener('click', (e) => {
@@ -319,11 +374,27 @@
 
         function checkGameOver() {
             if (playGame.gameOver) {
+                const overlay = document.getElementById('game-over-overlay');
+                const titleEl = document.getElementById('game-over-title');
+                const msgEl = document.getElementById('game-over-msg');
+                
+                if (playGame.winner === 1) {
+                    titleEl.textContent = "🏆 승리";
+                    titleEl.className = "game-over-title victory-title";
+                    msgEl.textContent = "훌륭합니다! 전술적인 승리를 거두셨습니다.";
+                } else if (playGame.winner === -1) {
+                    titleEl.textContent = "😢 패배";
+                    titleEl.className = "game-over-title defeat-title";
+                    msgEl.textContent = "AI가 당신보다 한 수 앞섰습니다. 다시 도전해보세요!";
+                } else {
+                    titleEl.textContent = "⚖️ 무승부";
+                    titleEl.className = "game-over-title";
+                    msgEl.textContent = "승부를 가리지 못했습니다.";
+                }
+                
                 setTimeout(() => {
-                    if (playGame.winner === 1) alert('🏆 승리!');
-                    else if (playGame.winner === -1) alert('😢 패배...');
-                    else alert('무승부');
-                }, 100);
+                    overlay.classList.add('show');
+                }, 500);
                 return true;
             }
             return false;
