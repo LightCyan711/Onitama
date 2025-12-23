@@ -148,30 +148,27 @@ class OnitamaUI {
     }
 
     // 카드 HTML 렌더링
-    renderCards(game, isPlayMode = false) {
+    renderCards(game, isPlayMode = false, selectedCardIdx = null) {
         if (isPlayMode) {
-            this.renderPlayModeCards(game);
+            this.renderPlayModeCards(game, selectedCardIdx);
         }
     }
 
-    renderPlayModeCards(game) {
+
+    renderPlayModeCards(game, selectedCardIdx = null) {
         // 플레이어 카드만 표시
         const playerCardsHolder = document.querySelector('#player-cards .cards-holder');
         if (playerCardsHolder) {
             playerCardsHolder.innerHTML = '';
-            game.redCards.forEach(cardId => {
+            game.redCards.forEach((cardId, index) => {
                 const card = getCard(cardId);
                 const cardEl = this.createCardElement(card);
-                cardEl.addEventListener('click', () => {
-                    console.log(`Card ${card.name} selected`);
-                    const cardIndex = game.redCards.indexOf(cardId);
-                    if (cardIndex !== -1) {
-                        game.selectCard(cardIndex);
-                        this.updateUI();
-                    }
-                });
+                if (selectedCardIdx === index) {
+                    cardEl.classList.add('selected');
+                }
                 playerCardsHolder.appendChild(cardEl);
             });
+
         }
 
         // 중앙 카드
@@ -180,11 +177,8 @@ class OnitamaUI {
             const card = getCard(game.centerCard);
             centerCardEl.innerHTML = '';
             const centerCardElement = this.createCardElement(card);
-            centerCardElement.addEventListener('click', () => {
-                console.log(`Center card ${card.name} clicked`);
-                // Add logic to handle center card click
-            });
             centerCardEl.appendChild(centerCardElement);
+
         }
     }
 

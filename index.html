@@ -146,8 +146,9 @@
 
         function updateUI() {
             playUI.drawBoard(playGame);
-            playUI.renderCards(playGame, true);
+            playUI.renderCards(playGame, true, selectedCard);
         }
+
 
         function setupEventListeners() {
             document.getElementById('btn-new-game').onclick = startNewGame;
@@ -170,14 +171,10 @@
 
         function selectCard(cardIdx) {
             selectedCard = cardIdx;
-            
-            // UI 하이라이트
-            document.querySelectorAll('#player-cards .card').forEach(c => c.classList.remove('selected'));
-            const cards = document.querySelectorAll('#player-cards .card');
-            if (cards[cardIdx]) cards[cardIdx].classList.add('selected');
-            
+            updateUI();
             if (selectedPiece) updatePossibleMoves();
         }
+
 
         function handleBoardClick(e) {
             if (playGame.gameOver) return;
