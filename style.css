@@ -22,17 +22,30 @@
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1010 100%);
+    font-family: 'Outfit', 'Noto Serif KR', serif;
+    background: radial-gradient(circle at center, #1a1010 0%, #0a0a0a 100%);
     color: var(--text-light);
     height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* 스크롤 방지 */
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-font-smoothing: antialiased;
 }
+
+/* 수묵 느낌의 미세 텍스처 배경 효과 */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png');
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+}
+
 
 
 .container {
@@ -52,13 +65,18 @@ header {
 }
 
 header h1 {
-    font-size: 1.8rem;
-    background: linear-gradient(135deg, var(--accent-gold), #ffd700);
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #f3e5ab, var(--accent-gold), #b8860b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 2px;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.2));
 }
+
 
 
 .subtitle {
@@ -100,15 +118,19 @@ header h1 {
 
 /* 패널 */
 .panel {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    padding: 15px;
+    background: rgba(26, 26, 26, 0.7); /* 투명도 조절 */
+    backdrop-filter: blur(15px); /* 유리 효과 */
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 20px;
+    padding: 20px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0; /* flex 자식의 overflow 방지 */
+    min-height: 0;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
+
 
 /* PC 가로 레이아웃 핵심 보강 */
 .game-layout {
@@ -138,11 +160,13 @@ header h1 {
 
 
 .status-card {
-    background: rgba(0,0,0,0.3);
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.4);
+    padding: 18px;
+    border-radius: 15px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
 }
+
 
 .center-card-wrapper {
     margin-top: 10px;
@@ -160,16 +184,18 @@ header h1 {
 }
 
 canvas {
-    border: 3px solid var(--accent-gold);
-    border-radius: 12px;
+    border: 4px solid var(--accent-gold);
+    border-radius: 8px;
     background: var(--bg-board);
-    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.1);
     max-height: 75vh;
     max-width: 100%;
     width: auto;
     height: auto;
     aspect-ratio: 1/1;
+    cursor: crosshair;
 }
+
 
 
 
@@ -195,9 +221,15 @@ canvas {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
+    background: linear-gradient(135deg, var(--accent-gold), #b8860b);
+    color: #121212;
 }
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #f3e5ab, var(--accent-gold));
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
 
 .btn-danger {
     background: linear-gradient(135deg, #dc2626, #b91c1c);
@@ -314,17 +346,28 @@ canvas {
 .card {
     width: var(--card-width);
     height: var(--card-height);
-    background: linear-gradient(135deg, #2d1810, #1a0f08);
-    border: 2px solid var(--accent-gold);
+    background: linear-gradient(135deg, #2a1810, #1a0f08);
+    background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
+    border: 2px solid rgba(212, 175, 55, 0.4);
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
+    overflow: hidden;
 }
+
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(45deg, transparent 50%, rgba(212, 175, 55, 0.05) 100%);
+    pointer-events: none;
+}
+
 
 
 .card:hover {
@@ -334,8 +377,10 @@ canvas {
 
 .card.selected {
     border-color: #ffd700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    transform: translateY(-8px) scale(1.03);
 }
+
 
 .card-name {
     color: var(--accent-gold);
@@ -447,9 +492,52 @@ footer {
 
 
 
+
+/* 세련된 알림 시스템 (Game Notice) */
+#game-notice {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    z-index: 5000;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+}
+
+#game-notice.show {
+    opacity: 1;
+    top: 18%;
+}
+
+#game-notice.hidden {
+    display: none;
+}
+
+/* 추가적인 프리미엄 디테일 */
+.info-section {
+    gap: 15px;
+}
+
+.ai-cards-section, #player-cards {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+
 /* 모바일 대응 (반전) */
 @media (max-width: 899px) {
     .game-layout {
+        display: flex;
         flex-direction: column;
         overflow-y: auto;
     }
@@ -467,4 +555,6 @@ footer {
         max-height: 40vh;
     }
 }
+
+
 

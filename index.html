@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오니타마 AI (ONNX) 🥋</title>
+    <title>Onitama AI - Zen Strategy Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- ONNX Runtime Web -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
@@ -32,6 +35,7 @@
     </style>
 </head>
 <body>
+    <div id="game-notice" class="hidden"></div>
     <div id="loading-overlay" class="hidden">
         AI 모델 로딩 중... 🤖
     </div>
@@ -152,10 +156,11 @@
             document.getElementById('turn-indicator').textContent = "당신의 차례입니다 (Red)";
         }
 
-        function updateUI() {
+        function updateUI(aiSelectedCard = null) {
             playUI.drawBoard(playGame);
-            playUI.renderCards(playGame, true, selectedCard);
+            playUI.renderCards(playGame, true, selectedCard, aiSelectedCard);
         }
+
 
 
         function setupEventListeners() {
@@ -208,9 +213,10 @@
             } else {
                 // 이동 시도
                 if (selectedCard === null) {
-                    alert('먼저 카드를 선택하세요!');
+                    playUI.showNotice('먼저 사용할 무술 카드를 선택하십시오.');
                     return;
                 }
+
 
                 const isValidMove = possibleMoves.some(([mx, my]) => mx === clickX && my === clickY);
 
@@ -278,6 +284,13 @@
                 const aiAction = await agent.selectAction(playGame);
                 
                 if (aiAction) {
+                    // AI가 선택한 카드 하이라이트 (시각적 피드백)
+                    updateUI(aiAction.cardIdx);
+                    document.getElementById('turn-indicator').textContent = "AI 이동 중...";
+                    
+                    // 사용자가 AI의 선택을 인지할 수 있도록 추가 딜레이
+                    await new Promise(resolve => setTimeout(resolve, 1200));
+                    
                     playGame.makeMove(aiAction);
                     updateUI();
                     if (checkGameOver()) return;
@@ -286,7 +299,7 @@
                 }
                 
                 document.getElementById('turn-indicator').textContent = "당신의 차례입니다 (Red)";
-            }, 100);
+            }, 800);
         }
 
         function checkGameOver() {
