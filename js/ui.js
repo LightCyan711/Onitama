@@ -181,9 +181,9 @@ class OnitamaUI {
     }
 
     // 카드 HTML 렌더링
-    renderCards(game, isPlayMode = false, selectedCardIdx = null) {
+    renderCards(game, isPlayMode = false, selectedCardIdx = null, aiSelectedCardIdx = null) {
         if (isPlayMode) {
-            this.renderPlayModeCards(game, selectedCardIdx);
+            this.renderPlayModeCards(game, selectedCardIdx, aiSelectedCardIdx);
         }
     }
 
