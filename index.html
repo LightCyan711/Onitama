@@ -57,7 +57,7 @@
 
                 <!-- 오른쪽: 정보 및 컨트롤 영역 -->
                 <div class="info-section">
-                    <div class="ai-cards-section">
+                    <div class="ai-cards-section hidden">
                         <div id="ai-cards" class="player-cards">
                             <div class="card-label">AI 카드</div>
                             <div class="cards-holder"></div>
@@ -99,10 +99,7 @@
         <button id="close-encyclopedia" class="btn btn-secondary">닫기</button>
     </div>
 
-        <footer>
-            <p>Runs with <strong>ONNX Runtime Web</strong> (WASM Endpoint)</p>
-        </footer>
-    </div>
+
 
     <!-- 순서 중요: 종속성 -->
     <script src="js/cards.js"></script>
@@ -166,17 +163,20 @@
         function setupEventListeners() {
             document.getElementById('btn-new-game').onclick = startNewGame;
 
-            // 카드 클릭
-            document.addEventListener('click', (e) => {
-                const cardEl = e.target.closest('.card');
-                if (cardEl && cardEl.closest('#player-cards')) {
-                    if (playGame.gameOver || playGame.currentPlayer !== 1) return;
-
-                    const cards = Array.from(document.querySelectorAll('#player-cards .card'));
-                    const cardIdx = cards.indexOf(cardEl);
-                    if (cardIdx !== -1) selectCard(cardIdx);
-                }
-            });
+            // 카드 클릭 (내 카드 선택)
+            const playerCardsHolder = document.querySelector('#player-cards .cards-holder');
+            if (playerCardsHolder) {
+                playerCardsHolder.addEventListener('click', (e) => {
+                    const cardEl = e.target.closest('.card');
+                    if (cardEl) {
+                        if (playGame.gameOver || playGame.currentPlayer !== 1) return;
+                        
+                        const cards = Array.from(playerCardsHolder.querySelectorAll('.card'));
+                        const cardIdx = cards.indexOf(cardEl);
+                        if (cardIdx !== -1) selectCard(cardIdx);
+                    }
+                });
+            }
 
             // 캔버스 클릭 (보드)
             document.getElementById('canvas-play').onclick = handleBoardClick;

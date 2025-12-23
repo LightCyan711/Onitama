@@ -249,7 +249,7 @@ class OnitamaUI {
         
         // 배경
         ctx.fillStyle = '#1a0f08';
-        ctx.fillRect(0, 0, 50, 50);
+        ctx.fillRect(0, 0, 70, 70);
         
         // 중앙 (현재 위치)
         ctx.fillStyle = '#d4af37';
