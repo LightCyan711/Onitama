@@ -99,3 +99,8 @@ function selectRandomCards() {
     }
     return indices;
 }
+
+// 모든 카드 반환
+function getAllCards() {
+    return CARDS.map((card, id) => ({ id, ...card }));
+}

@@ -159,6 +159,14 @@ class OnitamaUI {
             game.redCards.forEach(cardId => {
                 const card = getCard(cardId);
                 const cardEl = this.createCardElement(card);
+                cardEl.addEventListener('click', () => {
+                    console.log(`Card ${card.name} selected`);
+                    const cardIndex = game.redCards.indexOf(cardId);
+                    if (cardIndex !== -1) {
+                        game.selectCard(cardIndex);
+                        this.updateUI();
+                    }
+                });
                 playerCardsHolder.appendChild(cardEl);
             });
         }
@@ -168,7 +176,12 @@ class OnitamaUI {
         if (centerCardEl) {
             const card = getCard(game.centerCard);
             centerCardEl.innerHTML = '';
-            centerCardEl.appendChild(this.createCardElement(card));
+            const centerCardElement = this.createCardElement(card);
+            centerCardElement.addEventListener('click', () => {
+                console.log(`Center card ${card.name} clicked`);
+                // Add logic to handle center card click
+            });
+            centerCardEl.appendChild(centerCardElement);
         }
     }
 
@@ -210,5 +223,51 @@ class OnitamaUI {
         cardDiv.appendChild(patternDiv);
         
         return cardDiv;
+    }
+
+    setupCardEncyclopedia(cards) {
+        const encyclopedia = document.getElementById('card-encyclopedia');
+        const cardList = document.getElementById('card-list');
+        const closeBtn = document.getElementById('close-encyclopedia');
+
+        if (!encyclopedia || !cardList || !closeBtn) return;
+
+        closeBtn.addEventListener('click', () => {
+            encyclopedia.classList.add('hidden');
+        });
+
+        cardList.innerHTML = '';
+        cards.forEach(card => {
+            const cardEl = this.createCardElement(card);
+            cardEl.classList.add('encyclopedia-card');
+            cardList.appendChild(cardEl);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            console.log(`Key pressed: ${e.key}`); // Debugging log
+            if (e.key.toLowerCase() === 'f') {
+                console.log('Toggling encyclopedia visibility'); // Debugging log
+                encyclopedia.classList.toggle('hidden');
+                this.highlightCurrentGameCards(cards);
+            }
+        });
+    }
+
+    highlightCurrentGameCards(cards) {
+        const currentGameCardIds = [...game.redCards, game.centerCard, ...game.blueCards];
+        const cardElements = document.querySelectorAll('.encyclopedia-card');
+
+        cardElements.forEach(cardEl => {
+            const cardId = cards.find(card => card.name === cardEl.querySelector('.card-name').textContent)?.id;
+            if (currentGameCardIds.includes(cardId)) {
+                cardEl.classList.add('glow');
+            } else {
+                cardEl.classList.remove('glow');
+            }
+        });
+    }
+
+    handleError() {
+        alert('오류가 발생했습니다. 새 게임을 눌러주세요.');
     }
 }
