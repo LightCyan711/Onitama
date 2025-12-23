@@ -155,8 +155,22 @@ class OnitamaUI {
     }
 
 
-    renderPlayModeCards(game, selectedCardIdx = null) {
-        // 플레이어 카드만 표시
+    renderPlayModeCards(game, selectedCardIdx = null, aiSelectedCardIdx = null) {
+        // AI 카드 표시
+        const aiCardsHolder = document.querySelector('#ai-cards .cards-holder');
+        if (aiCardsHolder) {
+            aiCardsHolder.innerHTML = '';
+            game.blueCards.forEach((cardId, index) => {
+                const card = getCard(cardId);
+                const cardEl = this.createCardElement(card);
+                if (aiSelectedCardIdx === index) {
+                    cardEl.classList.add('selected');
+                }
+                aiCardsHolder.appendChild(cardEl);
+            });
+        }
+
+        // 플레이어 카드 표시
         const playerCardsHolder = document.querySelector('#player-cards .cards-holder');
         if (playerCardsHolder) {
             playerCardsHolder.innerHTML = '';
@@ -168,8 +182,8 @@ class OnitamaUI {
                 }
                 playerCardsHolder.appendChild(cardEl);
             });
-
         }
+
 
         // 중앙 카드
         const centerCardEl = document.getElementById('center-card');
