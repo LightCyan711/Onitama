@@ -16,5 +16,6 @@ build/
 # Local settings
 .vscode/
 .idea/
-*.onnx
-*.weights.bin
+# *.onnx  <-- 배포를 위해 허용함
+# *.weights.bin <-- 배포를 위해 허용함
+

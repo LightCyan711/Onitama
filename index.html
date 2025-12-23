@@ -105,7 +105,7 @@
             
             // ONNX Agent 초기화
             agent = new OnitamaOnnxAgent();
-            const success = await agent.load('/onitama-actor.onnx'); // 절대 경로로 수정
+            const success = await agent.load('./onitama-actor.onnx'); // 상대 경로로 수정
             
             loading.classList.add('hidden');
 
